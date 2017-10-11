@@ -1,0 +1,130 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Teacher List</title>
+ <style type="text/css">   
+    .border-table {   
+        border-collapse: collapse;   
+        border: none;   
+    }   
+    .border-table td {   
+        border: solid #000 1px;   
+    }   
+</style>  
+
+<script type="text/javascript" th:src="@{/jquery.min.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+	var contextRoot = /*[[@{/}]]*/ ''; 
+	//alert(contextRoot);
+
+	function deleteTeacher(id){
+		//alert(id);
+		document.forms['deleteForm'].action = contextRoot + "teacher/delete?id=" + id;  
+		document.forms['deleteForm'].submit();  
+	}
+	
+	function upTeacher(id,first){
+		if(first){
+			alert("已经是第一条，不可以上移！");
+			return;
+		}
+		document.forms['deleteForm'].action = contextRoot + "teacher/up?id=" + id;  
+		document.forms['deleteForm'].submit();  
+	}
+	
+	function downTeacher(id,last){
+		//alert(id);
+		if(last){
+			alert("已经是最后一条，不可以下移！");
+			return;
+		}
+		document.forms['deleteForm'].action = contextRoot + "teacher/down?id=" + id;  
+		document.forms['deleteForm'].submit();  
+	}	
+	
+	function updateTeacher(id){
+		 $.ajax({  
+             type: 'post',  
+             dataType: 'text',  
+             url: contextRoot + "teacher/update?id=" + id,  
+             cache: false,  
+             async: true,  
+             success: function (data) {
+            	 var jsonData = eval("("+data+")");
+            	 $("#teacherId").val(jsonData.id);
+            	 $("#name").val(jsonData.name);
+            	 $("input:radio[name='status'][value='" + jsonData.status + "']").attr("checked",'checked');
+            	 //$("input:radio[name='status'][value='" + jsonData.status + "']").prop("checked",'checked');
+             }  
+         });  
+	}
+	
+</script>
+</head>
+<body>
+	<h2>老师列表维护</h2>
+	
+	<table style="width:100%">
+		<tr>
+			<td>
+				<table border="1" align="left" style="width:80%" class="border-table">
+					<tr >
+					<th style="width:30%">姓名\去向情况</th>
+					<th style="width:15%">上班</th>
+					<th style="width:15%">请假</th>
+					<th style="width:15%">出差</th>
+					<th></th>
+					</tr>
+					<tr th:each=" teacher,userStat: ${list}" align="center" >
+						<td th:onclick="'javascript:updateTeacher('+ ${teacher.id} + ')'"><span th:text="${teacher.name}"></span></td>
+						<td><span th:if="${teacher.status eq '上班'}">√</span></td>
+						<td><span th:if="${teacher.status eq '请假'}">√</span></td>
+						<td><span th:if="${teacher.status eq '出差'}">√</span></td>
+						<td>
+							<button type="button" th:onclick="'javascript:deleteTeacher('+ ${teacher.id} + ')'">删除</button>
+							<button th:disabled="${userStat.first}"  type="button" th:onclick="'javascript:upTeacher('+ ${teacher.id} + ',' + ${userStat.first} + ')'">上移</button>
+							<button th:disabled="${userStat.last}" type="button" th:onclick="'javascript:downTeacher('+ ${teacher.id} + ',' + ${userStat.last} + ')'">下移</button>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+		
+		<tr>
+			<td>
+			<h3>修改老师去向情况</h3>
+				<form method="POST" th:action="@{/teacher/add}" name="updateForm"> 
+					<input type="hidden" name="id" id="teacherId" />
+					<label for="name">姓名:</label> <input type="text" disabled="disabled" name="name" id="name" size="10" />&nbsp;&nbsp;&nbsp;&nbsp;
+					<label for="status">去向情况:</label> 
+					<input type="radio" id="status1" name="status" value="上班" checked="checked"/>上班&nbsp;&nbsp;
+					<input type="radio" id="status2" name="status" value="请假"/>请假&nbsp;&nbsp;
+					<input type="radio" id="status3" name="status" value="出差"/>出差&nbsp;&nbsp;
+					&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="submit" value="确认"/>
+				</form>
+			</td>
+		</tr>
+		
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+		
+		<tr>
+			<td>
+				<h3>增加新老师</h3>
+				<form method="POST" th:action="@{/teacher/add}" name="addForm"> 
+					<label for="name">姓名:</label> <input type="text" name="name" size="10" />&nbsp;&nbsp;&nbsp;&nbsp;
+					<input type="submit" value="添加"/>
+				</form>
+			</td>
+		</tr>
+	</table>
+	
+	<form method="POST" th:action="@{/teacher/delete}" name="deleteForm">
+	</form>
+</body>
+</html>

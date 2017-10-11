@@ -1,0 +1,35 @@
+<html>
+<head>
+<title>Teacher List</title>
+<link rel="stylesheet" th:href="@{/style.css}"></link>
+</head>
+<body>
+	<h2>Teacher List</h2>
+	<div th:unless="${#lists.isEmpty(list)}">
+		<dl th:each="teacher : ${list}">
+			<dt class="bookHeadline">
+				<span th:text="${teacher.name}">Title</span>
+				<span th:text="${teacher.status}">Author</span>
+			</dt>
+			<dd class="bookDescription">
+				<span th:if="${teacher.remark}" th:text="${teacher.remark}">Description</span>
+			</dd>
+		</dl>
+	</div>
+	<div th:if="${#lists.isEmpty(list)}">
+		<p>You have no teacher in your list</p>
+	</div>
+	<hr />
+	<h3>Add a book</h3>
+	<form method="POST">
+		<label for="title">Title:</label> <input type="text" name="title"
+			size="50"></input><br /> <label for="author">Author:</label> <input
+			type="text" name="author" size="50"></input><br /> <label for="isbn">ISBN:</label>
+		<input type="text" name="isbn" size="15"></input><br /> <label
+			for="description">Description:</label><br />
+		<textarea name="description" cols="80" rows="5">
+</textarea>
+		<br /> <input type="submit"></input>
+	</form>
+</body>
+</html>
